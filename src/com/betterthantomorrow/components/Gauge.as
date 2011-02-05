@@ -1,5 +1,8 @@
 /*
-By PEZ, blog.betterthantomorrow.com, Feb 2011. 
+By PEZ, blog.betterthantomorrow.com, Feb 2011.
+Source home is here: https://github.com/PEZ/FlexGauge
+Clone away! And please show me your improvements via pull requests.
+
 Based on Gauge component by Smith & Fox: http://www.smithfox.com/?e=48
 in turn, based on the DegrafaGauge: Copyright (c) 2008, Thomas W. Gonzalez
 
