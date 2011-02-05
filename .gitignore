@@ -1,0 +1,19 @@
+# Mac OS X Finder and whatnot
+.DS_Store
+
+# build products
+/bin
+
+# Other source repository archive directories (protects when importing)
+.hg
+.svn
+CVS
+
+# automatic backup files
+*~.nib
+*.swp
+*~
+*(Autosaved).rtfd/
+Backup[ ]of[ ]*.pages/
+Backup[ ]of[ ]*.key/
+Backup[ ]of[ ]*.numbers/
