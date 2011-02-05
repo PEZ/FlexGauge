@@ -535,6 +535,7 @@ package com.betterthantomorrow.components {
 				_pointerRotator.stop();
 			}
 			_pointerRotator.angleFrom = _lastPointerRotation;
+			_lastPointerRotation = angle;
 			_pointerRotator.angleTo = angle;
 			_pointerRotator.play();
 		}
