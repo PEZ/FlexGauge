@@ -1,28 +1,28 @@
-package com.betterthantomorrow.controls.gauge {
-	/*
-	By PEZ, www.betterthantomorrow.com, Feb 2011. 
-	Based on Gauge component by Smith & Fox: http://www.smithfox.com/?e=48
-	in turn, based on the DegrafaGauge: Copyright (c) 2008, Thomas W. Gonzalez
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in
-	all copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	THE SOFTWARE.
-	*/
+/*
+By PEZ, blog.betterthantomorrow.com, Feb 2011. 
+Based on Gauge component by Smith & Fox: http://www.smithfox.com/?e=48
+in turn, based on the DegrafaGauge: Copyright (c) 2008, Thomas W. Gonzalez
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+package com.betterthantomorrow.components.gauge {
 	import flash.display.CapsStyle;
 	import flash.display.LineScaleMode;
 	import flash.events.Event;
@@ -30,7 +30,6 @@ package com.betterthantomorrow.controls.gauge {
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	
-	import mx.charts.LineChart;
 	import mx.charts.chartClasses.GraphicsUtilities;
 	import mx.controls.Image;
 	import mx.controls.Label;
@@ -112,11 +111,11 @@ package com.betterthantomorrow.controls.gauge {
 		private var _maxLabel:Label;
 		
 		//Privates
-		[Bindable] private var _maxValue:Number=100;
-		[Bindable] private var _minValue:Number=0;
+		[Bindable] private var _maxValue:Number=10;
+		[Bindable] private var _minValue:Number=1;
 		[Bindable] private var _value:Number=5;
-		[Bindable] private var _smallTicks:int=50;
-		[Bindable] private var _bigTicks:int=10;
+		[Bindable] private var _smallTicks:int=45;
+		[Bindable] private var _bigTicks:int=9;
 		
 		private var _dropShadowFilter:DropShadowFilter;
 		private var _diameter:Number;
@@ -148,9 +147,15 @@ package com.betterthantomorrow.controls.gauge {
 		private var _showMinMax:Boolean=true;
 		private var _glareAlpha:Number=0.6;
 		
-		public function set glareAlpha(param:Number):void {	_glareAlpha=param; }
+		public function set glareAlpha(param:Number):void {
+			_glareAlpha=param;
+			this.invalidateDisplayList();
+		}
 		
-		public function set showMinMax(param:Boolean):void { _showMinMax=param; }
+		public function set showMinMax(param:Boolean):void {
+			_showMinMax=param;
+			this.invalidateDisplayList();
+		}
 		
 		public function set showValue(param:Boolean):void {
 			_showValue=param;
@@ -160,29 +165,36 @@ package com.betterthantomorrow.controls.gauge {
 		public function get showValue():Boolean { return _showValue; }
 		
 		public function set minValue(param:Number):void {
-			if(positiveMaxValue)
-				if (param<_maxValue) _minValue=param;
-				else
-					if (param>_maxValue) _minValue=param; 	
-			//Reset Pointer
+			if(positiveMaxValue) {
+				if (param<_maxValue) {
+					_minValue=param;
+				}
+				else if (param>_maxValue) {
+					_minValue=param;	
+				}
+			}
 			setPointer();
 		}
 		
 		public function set maxValue(param:Number):void {
 			if(positiveMaxValue)
-				if (param>_minValue) _maxValue=param;
-				else
-					if (param<_minValue) _maxValue=param;  
-			//Reset Pointer
+				if (param>_minValue) {
+					_maxValue=param;
+				}
+				else if (param<_minValue) {
+					_maxValue=param;
+				}
 			setPointer();
 		}
 		
 		public function set smallTicks(param:int):void {
 			_smallTicks = param > 0 ? param : _smallTicks;
+			this.invalidateDisplayList();
 		}
 		
 		public function set bigTicks(param:int):void {
 			_bigTicks = param > 0 ? param : _bigTicks;
+			this.invalidateDisplayList();
 		}
 		
 		[Bindable][Inspectable]
@@ -237,11 +249,9 @@ package com.betterthantomorrow.controls.gauge {
 			return this.width;
 		}
 		
-		//设置默认样式, 你可以在mxml中改写
 		private static var classConstructed:Boolean = classConstruct();
-		
 		private static function classConstruct():Boolean {
-			if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("com.betterthantomorrow.controls.gauge.Gauge"))
+			if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("com.betterthantomorrow.components.gauge.Gauge"))
 			{
 				var myStyles:CSSStyleDeclaration = new CSSStyleDeclaration();
 				myStyles.defaultFactory = function():void
@@ -252,13 +262,13 @@ package com.betterthantomorrow.controls.gauge {
 					this.centerColor = 0x777777;
 					this.pointerColor = 0xEE3344;
 					this.ticksColor = 0xECECEC;
-					this.alertRatios = [40,80,100];
+					this.alertRatios = [3,6];
 					this.alertColors = [0xFF0000,0xFFFF00,0x00FF00];
-					this.alertAlphas = [.9,.9,.9];
+					this.alertAlphas = [.8,.7,.8];
 					this.fontColor = 0xFFFFFF;
 					this.fontSize = 18;
 				}
-				FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("com.betterthantomorrow.controls.gauge.Gauge", myStyles, true);
+				FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("com.betterthantomorrow.components.gauge.Gauge", myStyles, true);
 				
 			}
 			return true;
@@ -327,14 +337,14 @@ package com.betterthantomorrow.controls.gauge {
 			
 			_reflection=new Image();
 			_reflection.source=_reflectionSymbol;
-
+			
 			_minLabel=new Label();
 			_minLabel.setStyle("textAlign","left");
-			//_minLabel.visible=false;
+			_minLabel.visible = _showMinMax;
 			
 			_maxLabel=new Label();
 			_maxLabel.setStyle("textAlign","right");
-			//_maxLabel.visible=false;
+			_maxLabel.visible = _showMinMax;
 			
 			
 			_valueLabel=new Label();    
@@ -448,9 +458,9 @@ package com.betterthantomorrow.controls.gauge {
 		}
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
-
+			
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-
+			
 			setValueLabel();
 			_minLabel.text=minValue.toString();
 			_maxLabel.text=maxValue.toString();
@@ -470,7 +480,7 @@ package com.betterthantomorrow.controls.gauge {
 			
 			_minLabel.setStyle("color",fontColor);
 			_maxLabel.setStyle("color",fontColor);
-
+			
 			measure();
 			//this.clipContent=false;
 			drawTicks();
@@ -531,7 +541,7 @@ package com.betterthantomorrow.controls.gauge {
 		private function radiansForValue(v:Number):Number {
 			return -Math.PI - degreesForValue(v) * Math.PI / 180;
 		}
-
+		
 		private function transformColor(obj:Object,color:Number):void {
 			if (obj==null) return;
 			var c:ColorTransform=new ColorTransform();
@@ -591,15 +601,18 @@ package com.betterthantomorrow.controls.gauge {
 			var stroke:SolidColorStroke = new SolidColorStroke(color, _diameter * (TICK_LENGTH / 2), alpha,
 				false, LineScaleMode.NONE, CapsStyle.NONE);
 			GraphicsUtilities.setLineStyle(_alerts.graphics, stroke);
-			GraphicsUtilities.drawArc(_alerts.graphics, origin.x, origin.y, startAngle, endAngle, radius);
+			GraphicsUtilities.drawArc(_alerts.graphics, origin.x, origin.y,
+				startAngle - Math.PI / 2, endAngle - startAngle, radius);
 		}
-
+		
 		private function drawAlerts():void {
-			var alertLevels:Array=getStyle("alertRatios");
-			var alertColors:Array=getStyle("alertColors");
-			var alertAlphas:Array=getStyle("alertAlphas");
+			var levels:Array=getStyle("alertRatios").concat();
+			levels.unshift(_minValue);
+			levels.push(_maxValue);
+			var colors:Array=getStyle("alertColors");
+			var alphas:Array=getStyle("alertAlphas");
 			
-			if (!(null in [alertLevels, alertColors, alertAlphas])) {;
+			if (!(null in [levels, colors, alphas])) {;
 				var delta:Number;
 				var ratio:Number;
 				
@@ -612,11 +625,8 @@ package com.betterthantomorrow.controls.gauge {
 				ratio=_value/_maxValue;
 				
 				this._alerts.graphics.clear();
-				var startAngle:Number = radiansForValue(_minValue);
-				for (var i:int = 0; i<alertLevels.length; i++) {
-					var angle:Number = radiansForValue(alertLevels[i]);
-					drawAlertArc(startAngle, angle, alertColors[i], alertAlphas[i]);
-					startAngle = angle;
+				for (var i:int = 0; i < levels.length -1; i++) {
+					drawAlertArc(radiansForValue(levels[i]), radiansForValue(levels[i+1]), colors[i], alphas[i]);
 				}
 			}
 		}
