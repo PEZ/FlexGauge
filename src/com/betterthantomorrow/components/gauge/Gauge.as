@@ -106,7 +106,7 @@ package com.betterthantomorrow.components.gauge {
 		private var _reflectionSymbol:Class;
 		private var _reflection:Image;
 		
-		private var _valueLabel:Label;
+		private var _valueLabel:Label = new Label();
 		private var _minLabel:Label;
 		private var _maxLabel:Label;
 		
@@ -132,12 +132,8 @@ package com.betterthantomorrow.components.gauge {
 		public static const TICK_LENGTH:Number=0.17;
 		public static const SCALE_DIAMETER:Number=1/1.1;
 		
-		
 		[Bindable][Inspectable]
 		public var valueFormatter:Formatter=null;
-		
-		[Bindable][Inspectable]
-		public var positiveMaxValue:Boolean=true;
 		
 		/**
 		 * Setters and Getters
@@ -165,11 +161,13 @@ package com.betterthantomorrow.components.gauge {
 		public function get showValue():Boolean { return _showValue; }
 		
 		public function set minValue(param:Number):void {
-			if(positiveMaxValue) {
+			if (_maxValue >= 0) {
 				if (param<_maxValue) {
 					_minValue=param;
 				}
-				else if (param>_maxValue) {
+			}
+			else {
+				if (param>_maxValue) {
 					_minValue=param;	
 				}
 			}
@@ -177,13 +175,16 @@ package com.betterthantomorrow.components.gauge {
 		}
 		
 		public function set maxValue(param:Number):void {
-			if(positiveMaxValue)
+			if (_maxValue >= 0) {
 				if (param>_minValue) {
 					_maxValue=param;
 				}
-				else if (param<_minValue) {
+			}
+			else {
+				if (param<_minValue) {
 					_maxValue=param;
 				}
+			}
 			setPointer();
 		}
 		
@@ -214,8 +215,7 @@ package com.betterthantomorrow.components.gauge {
 		public function get value():Number { return this._value; }
 		
 		
-		public function set value(param:Number):void
-		{
+		public function set value(param:Number):void {
 			this._value=param;
 			setValueLabel();
 			setPointer();
@@ -251,11 +251,9 @@ package com.betterthantomorrow.components.gauge {
 		
 		private static var classConstructed:Boolean = classConstruct();
 		private static function classConstruct():Boolean {
-			if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("com.betterthantomorrow.components.gauge.Gauge"))
-			{
+			if (!FlexGlobals.topLevelApplication.styleManager.getStyleDeclaration("com.betterthantomorrow.components.gauge.Gauge")) {
 				var myStyles:CSSStyleDeclaration = new CSSStyleDeclaration();
-				myStyles.defaultFactory = function():void
-				{
+				myStyles.defaultFactory = function():void {
 					this.faceColor = 0x1C1C1C;
 					this.faceShadowColor = 0x000000;
 					this.bezelColor = 0x999999;
@@ -269,87 +267,71 @@ package com.betterthantomorrow.components.gauge {
 					this.fontSize = 18;
 				}
 				FlexGlobals.topLevelApplication.styleManager.setStyleDeclaration("com.betterthantomorrow.components.gauge.Gauge", myStyles, true);
-				
 			}
 			return true;
 		}
 		
-		// Override styleChanged() to detect changes in your new style.
 		override public function styleChanged(styleProp:String):void {
-			
 			super.styleChanged(styleProp);
 			
-			// Check to see if style changed. 
-			if (styleProp=="faceColor") 
-			{
+			if (styleProp=="faceColor") {
 				_faceColorChanged=true; 
-				return;
 			}
-			else if (styleProp=="faceShadowColor"){
+			else if (styleProp=="faceShadowColor") {
 				_faceShadowColorChanged=true; 
-				return;
 			}
-			else if (styleProp=="bezelColor"){
+			else if (styleProp=="bezelColor") {
 				_bezelColorChanged=true; 
-				return;
 			}
-			else if (styleProp=="centerColor"){
+			else if (styleProp=="centerColor") {
 				_centerColorChanged=true; 
-				return;
 			}
-			else if (styleProp=="pointerColor"){
+			else if (styleProp=="pointerColor") {
 				_pointerColorChanged=true; 
-				return;
 			}
-			else if (styleProp=="ticksColor"){
-				return;
+			else if (styleProp=="ticksColor") {
 			}
-			
+
 			invalidateDisplayList();
 		}
 		
-		
 		override protected function createChildren():void {
 			super.createChildren();
-			
-			_dropShadowFilter = new DropShadowFilter(2,45,0,.3,2,2,1,1);
-			
+			_dropShadowFilter = new DropShadowFilter(2, 45, 0, .3, 2, 2, 1, 1);
+
+			_alerts=new UIComponent();
+			_ticks=new UIComponent();
+
 			_face = new Image();
 			_face.source=_faceSymbol;
-			
+
 			_faceShadow = new Image();
 			_faceShadow.source=_faceShadowSymbol;
-			
-			_alerts=new UIComponent();
-			
-			_ticks=new UIComponent();
-			
+
 			_pointer=new Image();
 			_pointer.source=_pointerSymbol;
 			_pointer.filters=[_dropShadowFilter];
-			
+
 			_bezel=new Image();
 			_bezel.source=_bezelSymbol;
-			
+
 			_center=new Image();
 			_center.source=_centerSymbol;
 			_center.filters=[_dropShadowFilter];
-			
+
 			_reflection=new Image();
 			_reflection.source=_reflectionSymbol;
-			
+
 			_minLabel=new Label();
 			_minLabel.setStyle("textAlign","left");
 			_minLabel.visible = _showMinMax;
-			
+
 			_maxLabel=new Label();
 			_maxLabel.setStyle("textAlign","right");
 			_maxLabel.visible = _showMinMax;
-			
-			
-			_valueLabel=new Label();    
+
 			_valueLabel.setStyle("textAlign","center");		
-			
+
 			addChild(_face);
 			addChild(_faceShadow);
 			addChild(_alerts);
@@ -361,95 +343,86 @@ package com.betterthantomorrow.components.gauge {
 			addChild(_valueLabel);
 			addChild(_minLabel);
 			addChild(_maxLabel);
-			
 		}
-		
-		// Implement the commitProperties() method. 
-		override protected function commitProperties():void {
-			super.commitProperties();
-		}
-		
+				
 		override protected function measure():void {
 			super.measure();
-			
-			if ( _diameter == this.width ) return;
-			
-			_diameter = this.width;
-			
-			//this is where we need to figure out appropriate heights of components
-			_face.width=_diameter;//Gauge.FACE_DIAMETER * scale;
-			_face.height=_face.width;
-			_face.x=(_diameter-_face.width)/2;
-			_face.y=_face.x;
-			
-			_faceShadow.width=_face.width;
-			_faceShadow.height=_face.height;
-			_faceShadow.y=_face.y;
-			_faceShadow.x=_face.x;
-			
-			_ticks.height=_diameter;//Gauge.TICKS_DIAMETER*scale;
-			_ticks.width=_ticks.height;
-			_ticks.x=(_diameter - _ticks.width)/2;
-			_ticks.y=_ticks.x;
-			
-			var oldrt:Number = _pointer.rotation;
-			_pointer.rotation=0;
-			_pointer.height = _diameter / 2 * POINTER_HEIGHT;
-			_pointer.width = _diameter * POINTER_WIDTH;
-			_pointer.x=(_diameter-_pointer.width)/2;
-			_pointer.y = (_diameter / 2) - (_pointer.height * Gauge.POINTER_ORIGIN_SCALE);
-			
-			r.easingFunction = Exponential.easeOut;
-			r.duration = 500;
-			var originX:Number=_pointer.width/2;
-			var originY:Number = _pointer.height * Gauge.POINTER_ORIGIN_SCALE;
-			r.originX = originX;
-			r.originY = originY;
-			r.target = _pointer;
-			
-			_bezel.width=_diameter;//Gauge.BEZEL_DIAMETER*scale;
-			_bezel.height=_bezel.width;
-			_bezel.x=(_diameter-_bezel.width)/2;
-			_bezel.y=_bezel.x;
-			
-			_center.width = _diameter * NUB_DIAMETER;
-			_center.height=_center.width;
-			_center.x=(_diameter-_center.width)/2;
-			_center.y=_center.x;
-			
-			_reflection.width = _diameter * REFLECTION_WIDTH;
-			_reflection.height = _diameter * REFLECTION_HEIGHT;
-			_reflection.x = _reflection.y = _diameter * REFLECTION_OFFSET;
-			
-			_dropShadowFilter.distance=10;
-			_dropShadowFilter.blurX=10;
-			_dropShadowFilter.blurY=10;
-			
-			_center.filters=[_dropShadowFilter];
-			_pointer.filters=[_dropShadowFilter];
-			
-			_valueLabel.y = _diameter * 0.8;
-			_valueLabel.width=_diameter;
-			_valueLabel.height=_diameter * 0.15;
-			_valueLabel.setStyle("fontSize",_diameter * 0.11);
-			
-			var radius:Number = _ticks.width / 2;
-			_minLabel.width=_diameter;
-			_minLabel.height=_diameter * 0.1;
-			_minLabel.setStyle("fontSize",_diameter * 0.05);
-			_minLabel.x = radius + radius * Math.sin(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
-			_minLabel.y = radius + radius * Math.cos(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
-			
-			_maxLabel.width=_diameter;
-			_maxLabel.height=_diameter * 0.1;
-			_maxLabel.setStyle("fontSize",_diameter * 0.05);
-			_maxLabel.x = radius + radius * Math.sin(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2) - _maxLabel.width;
-			_maxLabel.y = radius + radius * Math.cos(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
-			
+			if (_diameter != this.width) {
+				_diameter = this.width;
+				
+				_face.width=_diameter;
+				_face.height=_face.width;
+				_face.x=(_diameter-_face.width)/2;
+				_face.y=_face.x;
+				
+				_faceShadow.width=_face.width;
+				_faceShadow.height=_face.height;
+				_faceShadow.y=_face.y;
+				_faceShadow.x=_face.x;
+				
+				_ticks.height=_diameter;
+				_ticks.width=_ticks.height;
+				_ticks.x=(_diameter - _ticks.width)/2;
+				_ticks.y=_ticks.x;
+				
+				var oldrt:Number = _pointer.rotation;
+				_pointer.rotation=0;
+				_pointer.height = _diameter / 2 * POINTER_HEIGHT;
+				_pointer.width = _diameter * POINTER_WIDTH;
+				_pointer.x=(_diameter-_pointer.width)/2;
+				_pointer.y = (_diameter / 2) - (_pointer.height * Gauge.POINTER_ORIGIN_SCALE);
+				
+				r.easingFunction = Exponential.easeOut;
+				r.duration = 500;
+				var originX:Number=_pointer.width/2;
+				var originY:Number = _pointer.height * Gauge.POINTER_ORIGIN_SCALE;
+				r.originX = originX;
+				r.originY = originY;
+				r.target = _pointer;
+				
+				_bezel.width=_diameter;
+				_bezel.height=_bezel.width;
+				_bezel.x=(_diameter-_bezel.width)/2;
+				_bezel.y=_bezel.x;
+				
+				_center.width = _diameter * NUB_DIAMETER;
+				_center.height=_center.width;
+				_center.x=(_diameter-_center.width)/2;
+				_center.y=_center.x;
+				
+				_reflection.width = _diameter * REFLECTION_WIDTH;
+				_reflection.height = _diameter * REFLECTION_HEIGHT;
+				_reflection.x = _reflection.y = _diameter * REFLECTION_OFFSET;
+				
+				_dropShadowFilter.distance=10;
+				_dropShadowFilter.blurX=10;
+				_dropShadowFilter.blurY=10;
+				
+				_center.filters=[_dropShadowFilter];
+				_pointer.filters=[_dropShadowFilter];
+				
+				_valueLabel.y = _diameter * 0.8;
+				_valueLabel.width=_diameter;
+				_valueLabel.height=_diameter * 0.15;
+				_valueLabel.setStyle("fontSize",_diameter * 0.11);
+				
+				var radius:Number = _ticks.width / 2;
+				_minLabel.width=_diameter;
+				_minLabel.height=_diameter * 0.1;
+				_minLabel.setStyle("fontSize",_diameter * 0.05);
+				_minLabel.x = radius + radius * Math.sin(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
+				_minLabel.y = radius + radius * Math.cos(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
+				
+				_maxLabel.width=_diameter;
+				_maxLabel.height=_diameter * 0.1;
+				_maxLabel.setStyle("fontSize",_diameter * 0.05);
+				_maxLabel.x = radius + radius * Math.sin(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2) - _maxLabel.width;
+				_maxLabel.y = radius + radius * Math.cos(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
+			}
 		}
 		
 		private function setValueLabel():void {
-			if(valueFormatter) {
+			if (valueFormatter) {
 				_valueLabel.text=valueFormatter.format(value);
 			}
 			else {
@@ -466,76 +439,66 @@ package com.betterthantomorrow.components.gauge {
 			_maxLabel.text=maxValue.toString();
 			
 			var fontColor:Number = getStyle("fontColor");
-			
-			//_valueLabel.setStyle("fontSize",getStyle("fontSize"));
-			_valueLabel.setStyle("color",fontColor);
-			_valueLabel.setStyle("fontFamily",getStyle("fontFamily"));
-			_valueLabel.setStyle("fontStyle",getStyle("fontStyle")); 
-			_valueLabel.setStyle("fontWeight",getStyle("fontWeight"));
-			_valueLabel.setStyle("fontSharpness",getStyle("fontSharpness"));
-			_valueLabel.setStyle("fontAntiAliasType",getStyle("fontAntiAliasType"));
+			_valueLabel.setStyle("color", fontColor);
+			_valueLabel.setStyle("fontFamily", getStyle("fontFamily"));
+			_valueLabel.setStyle("fontStyle", getStyle("fontStyle")); 
+			_valueLabel.setStyle("fontWeight", getStyle("fontWeight"));
+			_valueLabel.setStyle("fontSharpness", getStyle("fontSharpness"));
+			_valueLabel.setStyle("fontAntiAliasType", getStyle("fontAntiAliasType"));
 			_valueLabel.visible=this._showValue;
 			
 			_reflection.alpha=_glareAlpha;
 			
-			_minLabel.setStyle("color",fontColor);
-			_maxLabel.setStyle("color",fontColor);
+			_minLabel.setStyle("color", fontColor);
+			_maxLabel.setStyle("color", fontColor);
 			
 			measure();
-			//this.clipContent=false;
 			drawTicks();
 			drawAlerts();
 			
-			// Check to see if style changed. 
-			if (_faceColorChanged==true) 
-			{
+			if (_faceColorChanged == true) {
 				transformColor(_face,getStyle("faceColor"));
 				_faceColorChanged=false;
 			}
-			
-			if (_faceShadowColorChanged==true) 
-			{
+			if (_faceShadowColorChanged==true) {
 				transformColor(_faceShadow,getStyle("faceShadowColor"));
 				_faceShadowColorChanged=false;
 			}
-			if (_bezelColorChanged==true) 
-			{
+			if (_bezelColorChanged==true) {
 				transformColor(_bezel,getStyle("bezelColor"));
 				_bezelColorChanged=false;
 			}
-			if (_centerColorChanged==true) 
-			{
+			if (_centerColorChanged==true) {
 				transformColor(_center,getStyle("centerColor"));
 				_centerColorChanged=false;
 			}
-			if (_pointerColorChanged==true) 
-			{
+			if (_pointerColorChanged==true) {
 				transformColor(_pointer,getStyle("pointerColor"));
 				_pointerColorChanged=false;
 			}
 		}
 		
 		private function calculatePointerAngle():Number {
-			//rotate appropriate angle
 			return degreesForValue(_value);
 		}
 		
 		private function degreesForValue(v:Number):Number {
 			var delta:Number;
 			var ratio:Number;
-			var angle:Number;
-			if (this.positiveMaxValue)
+			if (_maxValue >= 0) {
 				delta=this._maxValue-this._minValue;
-			else
+			}
+			else {
 				delta=this._minValue-this._maxValue;
-			
-			ratio=(v-_minValue)/delta;
-			//Check to see if we exceed boundary conditions
-			if (v > this._maxValue) ratio=1;
-			if (v < this._minValue) ratio=0;
-			angle=(240*ratio)-120
-			
-			return angle;			
+			}
+			ratio = (v-_minValue)/delta;
+			if (v > this._maxValue) {
+				ratio=1;
+			}
+			if (v < this._minValue) {
+				ratio=0;
+			}
+			return (240*ratio)-120;			
 		}
 		
 		private function radiansForValue(v:Number):Number {
@@ -543,20 +506,15 @@ package com.betterthantomorrow.components.gauge {
 		}
 		
 		private function transformColor(obj:Object,color:Number):void {
-			if (obj==null) return;
-			var c:ColorTransform=new ColorTransform();
-			c.color=color; 
-			
-			var ct:ColorTransform;
-			
-			ct=new ColorTransform(1,1,1,1,c.redOffset-127,c.greenOffset-127,c.blueOffset-127,0);
-			obj.transform.colorTransform=ct;
-			
+			if (obj != null) {
+				var c:ColorTransform=new ColorTransform();
+				c.color=color; 
+				var ct:ColorTransform;
+				ct=new ColorTransform(1,1,1,1,c.redOffset-127,c.greenOffset-127,c.blueOffset-127,0);
+				obj.transform.colorTransform=ct;
+			}
 		}
 		
-		/**
-		 * This function draws the tick marks around the gauge
-		 */
 		private function drawTicks():void {  	
 			var fCenterX:Number=(_ticks.width)/2;
 			var fCenterY:Number=fCenterX;
@@ -574,7 +532,7 @@ package com.betterthantomorrow.components.gauge {
 				var tick_y:Number = fRadius * Math.cos(angle)
 				_ticks.graphics.moveTo(fCenterX + tick_x * SCALE_DIAMETER,
 					fCenterY + tick_y * SCALE_DIAMETER)
-				if (i % (_smallTicks/_bigTicks) == 0) {
+				if (i % (_smallTicks / _bigTicks) == 0) {
 					_ticks.graphics.lineTo(fCenterX + tick_x * (SCALE_DIAMETER - TICK_LENGTH * 1.35),
 						fCenterY + tick_y * (SCALE_DIAMETER - TICK_LENGTH * 1.35))
 				}
@@ -601,8 +559,7 @@ package com.betterthantomorrow.components.gauge {
 			var stroke:SolidColorStroke = new SolidColorStroke(color, _diameter * (TICK_LENGTH / 2), alpha,
 				false, LineScaleMode.NONE, CapsStyle.NONE);
 			GraphicsUtilities.setLineStyle(_alerts.graphics, stroke);
-			GraphicsUtilities.drawArc(_alerts.graphics, origin.x, origin.y,
-				startAngle - Math.PI / 2, endAngle - startAngle, radius);
+			GraphicsUtilities.drawArc(_alerts.graphics, origin.x, origin.y, startAngle - Math.PI / 2, endAngle - startAngle, radius);
 		}
 		
 		private function drawAlerts():void {
@@ -616,7 +573,7 @@ package com.betterthantomorrow.components.gauge {
 				var delta:Number;
 				var ratio:Number;
 				
-				if (this.positiveMaxValue) {
+				if (_maxValue >= 0) {
 					delta = this._maxValue - this._minValue;
 				}
 				else {
