@@ -30,7 +30,6 @@ THE SOFTWARE.
 package com.betterthantomorrow.components {
 	import flash.display.CapsStyle;
 	import flash.display.LineScaleMode;
-	import flash.events.Event;
 	import flash.filters.DropShadowFilter;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
@@ -122,16 +121,19 @@ package com.betterthantomorrow.components {
 		private var _dropShadowFilter:DropShadowFilter;
 		private var _diameter:Number;
 		
-		public static const POINTER_WIDTH:Number = 0.07;
-		public static const POINTER_HEIGHT:Number = 1.25;
-		public static const POINTER_ORIGIN_SCALE:Number = 0.68;
-		public static const NUB_DIAMETER:Number = 0.1;
-		public static const REFLECTION_WIDTH:Number = 1.0;
-		public static const REFLECTION_HEIGHT:Number = 0.6;
-		public static const REFLECTION_OFFSET:Number = 0.05;
-		public static const TICK_THICKNESS:Number = 0.005;
-		public static const TICK_LENGTH:Number = 0.17;
-		public static const SCALE_DIAMETER:Number = 1/1.1;
+		private static const POINTER_WIDTH:Number = 0.07;
+		private static const POINTER_HEIGHT:Number = 1.25;
+		private static const POINTER_ORIGIN_SCALE:Number = 0.68;
+		private static const NUB_DIAMETER:Number = 0.1;
+		private static const REFLECTION_WIDTH:Number = 1.0;
+		private static const REFLECTION_HEIGHT:Number = 0.6;
+		private static const REFLECTION_OFFSET:Number = 0.05;
+		private static const TICK_THICKNESS:Number = 0.005;
+		private static const TICK_LENGTH:Number = 0.17;
+		private static const SCALE_DIAMETER:Number = 1/1.1;
+		private static const VALUE_LABEL_SIZE:Number = 0.11;
+		private static const VALUE_LABEL_Y_OFFSET:Number = 0.8;
+		private static const MINMAX_LABEL_SIZE:Number = 0.07;
 		
 		[Bindable][Inspectable]
 		public var valueFormatter:Formatter = null;
@@ -225,7 +227,6 @@ package com.betterthantomorrow.components {
 			if (_pointer != null) {
 				rotatePointer();
 			}
-			dispatchEvent(new Event("change"));
 		}
 		
 		override public function set height(value:Number):void {
@@ -397,16 +398,16 @@ package com.betterthantomorrow.components {
 				_center.filters = [_dropShadowFilter];
 				_pointer.filters = [_dropShadowFilter];
 				
-				_valueLabel.y = _diameter * 0.83;
+				_valueLabel.y = _diameter * VALUE_LABEL_Y_OFFSET;
 				_valueLabel.width = _diameter;
 				_valueLabel.height = _diameter * 0.15;
-				_valueLabel.setStyle("fontSize", _diameter * 0.09);
+				_valueLabel.setStyle("fontSize", _diameter * VALUE_LABEL_SIZE);
 				
 				var radius:Number = _ticks.width / 2;
 				_minLabel.width = _maxLabel.width = _diameter;
 				_minLabel.height = _maxLabel.height = _diameter * 0.1;
-				_minLabel.setStyle("fontSize", _diameter * 0.05);
-				_maxLabel.setStyle("fontSize", _diameter * 0.05);
+				_minLabel.setStyle("fontSize", _diameter * MINMAX_LABEL_SIZE);
+				_maxLabel.setStyle("fontSize", _diameter * MINMAX_LABEL_SIZE);
 				_minLabel.x = radius + radius * Math.sin(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
 				_minLabel.y = radius + radius * Math.cos(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);				
 				_maxLabel.x = radius + radius * Math.sin(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2) - _maxLabel.width;
