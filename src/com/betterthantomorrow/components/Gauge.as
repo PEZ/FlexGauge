@@ -127,9 +127,10 @@ package com.betterthantomorrow.components {
 		private static const REFLECTION_WIDTH:Number = 1.0;
 		private static const REFLECTION_HEIGHT:Number = 0.6;
 		private static const REFLECTION_OFFSET:Number = 0.05;
-		private static const TICK_THICKNESS:Number = 0.005;
-		private static const TICK_LENGTH:Number = 0.17;
-		private static const SCALE_DIAMETER:Number = 1/1.1;
+		private static const TICK_THICKNESS:Number = 0.006;
+		private static const TICK_LENGTH_SMALL:Number = 0.23;
+		private static const TICK_LENGTH_BIG:Number = 0.28;
+		private static const SCALE_DIAMETER:Number = 1/1.12;
 		private static const VALUE_LABEL_SIZE:Number = 0.11;
 		private static const VALUE_LABEL_Y_OFFSET:Number = 0.1;
 		private static const MINMAX_LABEL_SIZE:Number = 0.07;
@@ -258,8 +259,8 @@ package com.betterthantomorrow.components {
 					this.pointerColor = 0xEE3344;
 					this.ticksColor = 0xECECEC;
 					this.alertRatios = [3, 6];
-					this.alertColors = [0xFF0000, 0xFFFF00, 0x00FF00];
-					this.alertAlphas = [.8, .7, .8];
+					this.alertColors = [0xFF0000, 0xFFFF00, 0x00BB11];
+					this.alertAlphas = [.8, .8, .98];
 					this.fontColor = 0xFFFFFF;
 					this.fontSize = 18;
 				}
@@ -408,10 +409,10 @@ package com.betterthantomorrow.components {
 				_minLabel.height = _maxLabel.height = _diameter * 0.1;
 				_minLabel.setStyle("fontSize", _diameter * MINMAX_LABEL_SIZE);
 				_maxLabel.setStyle("fontSize", _diameter * MINMAX_LABEL_SIZE);
-				_minLabel.x = radius + radius * Math.sin(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
-				_minLabel.y = radius + radius * Math.cos(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);				
-				_maxLabel.x = radius + radius * Math.sin(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2) - _maxLabel.width;
-				_maxLabel.y = radius + radius * Math.cos(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH / 2);
+				_minLabel.x = radius + radius * Math.sin(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH_SMALL / 2);
+				_minLabel.y = radius + radius * Math.cos(radiansForValue(minValue)) * (SCALE_DIAMETER - TICK_LENGTH_SMALL / 2);				
+				_maxLabel.x = radius + radius * Math.sin(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH_SMALL / 2) - _maxLabel.width;
+				_maxLabel.y = radius + radius * Math.cos(radiansForValue(maxValue)) * (SCALE_DIAMETER - TICK_LENGTH_SMALL / 2);
 			}
 		}
 		
@@ -509,30 +510,30 @@ package com.betterthantomorrow.components {
 			}
 		}
 		
-		private function drawTicks():void {  	
-			var radius:Number = (_ticks.width)/2;
-			
-			var tickColor:Number = getStyle("ticksColor"); 
-			
+		private function drawTicks():void {  				
 			_ticks.graphics.clear();
-			_ticks.graphics.lineStyle(_diameter * TICK_THICKNESS, tickColor, 1, false, LineScaleMode.NONE, CapsStyle.NONE);
-			
-			for(var i:int = 0; i <= _smallTicks; i++) {
-				var value:Number = _minValue + i * (_maxValue - _minValue) / _smallTicks;
-				var angle:Number = radiansForValue(value);
-				var tick_x:Number = radius * Math.sin(angle);
-				var tick_y:Number = radius * Math.cos(angle)
-				_ticks.graphics.moveTo(radius + tick_x * SCALE_DIAMETER,
-					radius + tick_y * SCALE_DIAMETER)
-				if (i % (_smallTicks / _bigTicks) == 0) {
-					_ticks.graphics.lineTo(radius + tick_x * (SCALE_DIAMETER - TICK_LENGTH * 1.35),
-						radius + tick_y * (SCALE_DIAMETER - TICK_LENGTH * 1.35))
+			if (_diameter > 50) {
+				var radius:Number = (_ticks.width)/2;
+				var tickColor:Number = getStyle("ticksColor"); 
+				_ticks.graphics.lineStyle(_diameter * TICK_THICKNESS, tickColor, 1, false, LineScaleMode.NONE, CapsStyle.NONE);
+				
+				for(var i:int = 0; i <= _smallTicks; i++) {
+					var value:Number = _minValue + i * (_maxValue - _minValue) / _smallTicks;
+					var angle:Number = radiansForValue(value);
+					var tick_x:Number = radius * Math.sin(angle);
+					var tick_y:Number = radius * Math.cos(angle)
+					_ticks.graphics.moveTo(radius + tick_x * SCALE_DIAMETER,
+						radius + tick_y * SCALE_DIAMETER)
+					if (i % (_smallTicks / _bigTicks) == 0) {
+						_ticks.graphics.lineTo(radius + tick_x * (SCALE_DIAMETER - TICK_LENGTH_BIG),
+							radius + tick_y * (SCALE_DIAMETER - TICK_LENGTH_BIG))
+					}
+					else {
+						_ticks.graphics.lineTo(radius + tick_x * (SCALE_DIAMETER - TICK_LENGTH_SMALL),
+							radius + tick_y * (SCALE_DIAMETER - TICK_LENGTH_SMALL))
+					}
 				}
-				else {
-					_ticks.graphics.lineTo(radius + tick_x * (SCALE_DIAMETER - TICK_LENGTH),
-						radius + tick_y * (SCALE_DIAMETER - TICK_LENGTH))
-				}
-			}   	
+			}
 		}
 		
 		private function rotatePointer():void  {
@@ -548,8 +549,8 @@ package com.betterthantomorrow.components {
 		
 		private function drawAlertArc(startAngle:Number, endAngle:Number, color:Number, alpha:Number):void {
 			var origin:Point = new Point(_diameter / 2, _diameter / 2);
-			var radius:Number = (_diameter * (SCALE_DIAMETER - TICK_LENGTH / 2)) / 2;
-			var stroke:SolidColorStroke = new SolidColorStroke(color, _diameter * (TICK_LENGTH / 2), alpha,
+			var radius:Number = (_diameter * (SCALE_DIAMETER - TICK_LENGTH_SMALL / 1.95)) / 2;
+			var stroke:SolidColorStroke = new SolidColorStroke(color, _diameter * (TICK_LENGTH_SMALL / 1.95), alpha,
 				false, LineScaleMode.NONE, CapsStyle.NONE);
 			GraphicsUtilities.setLineStyle(_alerts.graphics, stroke);
 			GraphicsUtilities.drawArc(_alerts.graphics, origin.x, origin.y, startAngle - Math.PI / 2, endAngle - startAngle, radius);
