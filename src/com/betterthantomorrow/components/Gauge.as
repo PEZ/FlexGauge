@@ -43,8 +43,7 @@ package com.betterthantomorrow.components {
 	import mx.effects.easing.Exponential;
 	import mx.formatters.Formatter;
 	import mx.graphics.SolidColorStroke;
-	import mx.styles.CSSStyleDeclaration;
-	
+	import mx.styles.CSSStyleDeclaration;	
 	
 	//Face Color
 	[Style(name = "faceColor", type = "Number", format = "Color", inherit = "yes")]
@@ -132,7 +131,7 @@ package com.betterthantomorrow.components {
 		private static const TICK_LENGTH:Number = 0.17;
 		private static const SCALE_DIAMETER:Number = 1/1.1;
 		private static const VALUE_LABEL_SIZE:Number = 0.11;
-		private static const VALUE_LABEL_Y_OFFSET:Number = 0.8;
+		private static const VALUE_LABEL_Y_OFFSET:Number = 0.1;
 		private static const MINMAX_LABEL_SIZE:Number = 0.07;
 		
 		[Bindable][Inspectable]
@@ -398,10 +397,11 @@ package com.betterthantomorrow.components {
 				_center.filters = [_dropShadowFilter];
 				_pointer.filters = [_dropShadowFilter];
 				
-				_valueLabel.y = _diameter * VALUE_LABEL_Y_OFFSET;
 				_valueLabel.width = _diameter;
-				_valueLabel.height = _diameter * 0.15;
-				_valueLabel.setStyle("fontSize", _diameter * VALUE_LABEL_SIZE);
+				var fontSize:Number = Math.max(_diameter * VALUE_LABEL_SIZE, 10);
+				_valueLabel.setStyle("fontSize", fontSize);
+				_valueLabel.height = fontSize * 2;
+				_valueLabel.y = _diameter - _diameter * VALUE_LABEL_Y_OFFSET - fontSize;
 				
 				var radius:Number = _ticks.width / 2;
 				_minLabel.width = _maxLabel.width = _diameter;
