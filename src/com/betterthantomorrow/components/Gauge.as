@@ -41,9 +41,10 @@ package com.betterthantomorrow.components {
 	import mx.core.UIComponent;
 	import mx.effects.Rotate;
 	import mx.effects.easing.Exponential;
+	import mx.events.ResizeEvent;
 	import mx.formatters.Formatter;
 	import mx.graphics.SolidColorStroke;
-	import mx.styles.CSSStyleDeclaration;	
+	import mx.styles.CSSStyleDeclaration;
 	
 	//Face Color
 	[Style(name = "faceColor", type = "Number", format = "Color", inherit = "yes")]
@@ -232,7 +233,7 @@ package com.betterthantomorrow.components {
 		override public function set height(value:Number):void {
 			diameter = value;
 		}
-		
+
 		override public function set width(value:Number):void {
 			diameter = value;
 		}
@@ -293,8 +294,17 @@ package com.betterthantomorrow.components {
 			invalidateDisplayList();
 		}
 		
+		private function sizeHasChanged(event:ResizeEvent):void {
+			if (height != width) {
+				super.height = width;
+			}
+			
+		}
 		override protected function createChildren():void {
 			super.createChildren();
+
+			addEventListener(ResizeEvent.RESIZE, sizeHasChanged);
+
 			_dropShadowFilter = new DropShadowFilter(2, 45, 0, .3, 2, 2, 1, 1);
 
 			_alerts = new UIComponent();
