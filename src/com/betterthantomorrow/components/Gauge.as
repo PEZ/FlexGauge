@@ -300,6 +300,7 @@ package com.betterthantomorrow.components {
 			}
 			
 		}
+
 		override protected function createChildren():void {
 			super.createChildren();
 
