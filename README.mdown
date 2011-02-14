@@ -1,4 +1,4 @@
-A standalone Gauge component for Adobe Flex 4.
+##A standalone Gauge component for Adobe Flex 4.
 
 Skinnable, somewhat stylable and quite flexible. Though lots of stuff is still
 hardcoded. There are probably bugs too. I know it doesn't really work for negative
@@ -6,14 +6,13 @@ max values, yet.
 
 See a demo here: [http://dl.dropbox.com/u/3259215/gauge-demo/gaugetestflash.html](http://dl.dox.com/u/3259215/gauge-demo/gaugetestflash.html)
 View source is enable in the demo so you can see how the component is used.
-ropb
-Quick howto use this in your Flex 4 project:
-============================================
+
+###Quick howto use this in your Flex 4 project:
 Clone (or, preferably, fork-then-clone) this project and then import it into Flash Builder.
 It should get imported as a Flex Library project. Then you have at least two options:
 
-#. Add the gauge library project to the Build Path of the project you need the gauge in.
-#. Build the library project and copy the resulting swc-file out of the bin/ folder and put it in the libs/ folder of your gauge-needing project.
+1. Add the gauge library project to the Build Path of the project you need the gauge in.
+2. Build the library project and copy the resulting swc-file out of the bin/ folder and put it in the libs/ folder of your gauge-needing project.
 
 Option 1 is to prefer I'd say, because then you can much easier follow what's going on in the debugger, fix bugs in the gauge and such.
 Option 2 assumes you have a standard setup project with a library folder called libs/ setup in your projects Build Path.
