@@ -17,5 +17,19 @@ It should get imported as a Flex Library project. Then you have at least two opt
 Option 1 is to prefer I'd say, because then you can much easier follow what's going on in the debugger, fix bugs in the gauge and such.
 Option 2 assumes you have a standard setup project with a library folder called libs/ setup in your projects Build Path.
 
+###Keep your fork in sync
+If you fork this repository and still want to keep your fork in sync with any bug fixes/changes in this repo that I either make
+myself or pull in from pull requests from others; This is the easiest way I have found:
+
+1. Add this repository as a remote upstream to the clone of your fork: <br>
+ `git remote add upstream https://github.com/facebook/facebook-ios-sdk.git`
+2. Then fetch from upstream:<br>
+ `git fetch upstream`
+3. Whenever you want to merge in any changes in the main repo:<br>
+ `git merge upstream/master`
+
+That last step is assuming you want to merge the master branch of course, but that's the only branch there is yet anyway. =)
+
+###Origins
 The gauge is based on [this work](http://www.smithfox.com/?e=48) by Smith & Fox.
 Which in turn was based on the now famous Degrafa Gauge by Thomas Gonzales.
