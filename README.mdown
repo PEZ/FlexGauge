@@ -22,7 +22,7 @@ If you fork this repository and still want to keep your fork in sync with any bu
 myself or pull in from pull requests from others; This is the easiest way I have found:
 
 1. Add this repository as a remote upstream to the clone of your fork: <br>
- `git remote add upstream https://github.com/facebook/facebook-ios-sdk.git`
+ `git remote add upstream https://PEZ@github.com/PEZ/FlexGauge.git`
 2. Then fetch from upstream:<br>
  `git fetch upstream`
 3. Whenever you want to merge in any changes in the main repo:<br>
