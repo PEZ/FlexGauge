@@ -68,13 +68,14 @@ package com.betterthantomorrow.components {
 	[Style(name = "fontColor", type = "Number", format = "Color", inherit = "yes")]
 	
 	public class Gauge extends UIComponent {
+		
 		public function Gauge():void {
 			super();
 		}
 		
 		private var _pointerRotator:Rotate = new Rotate();
 		
-		//CHILDREN - You can use your own swf with the same symbol names to resking this gauge.
+		//CHILDREN - You can use your own swf with the same symbol names to re-skin this gauge.
 		[@Embed(source = 'gauge/skins/GaugeSkins_Skin1.swf', symbol = 'face')][Bindable]
 		private var _faceSymbol:Class;
 		private var _face:Image;
@@ -135,6 +136,35 @@ package com.betterthantomorrow.components {
 		private static const VALUE_LABEL_SIZE:Number = 0.11;
 		private static const VALUE_LABEL_Y_OFFSET:Number = 0.1;
 		private static const MINMAX_LABEL_SIZE:Number = 0.07;
+		
+		//-----------------------------------------------------------------------
+		// Migitgates origin-rounding drift by not unnessarily re-computing origin.
+		// Make origin a singleton after second measurement after a resize.
+		// The first measurement happens before the pointer is resized.
+		// -Ed Mauget. mauget@gmail.com
+		private var _countOfMeasurements:int = 0;
+		private var _pointerCenter:Point;
+		
+		private function get countOfMeasurements():int {
+			return _countOfMeasurements;
+		}
+		
+		private function set countOfMeasurements(newValue:int):void {
+			_countOfMeasurements = newValue;
+		}
+		
+		private function getPointOrigin(pointer:Image):Point {
+			if (countOfMeasurements++ <= 2){
+				this._pointerCenter = new Point(pointer.width / 2, pointer.height * POINTER_ORIGIN_SCALE);
+			}
+			return this._pointerCenter;
+		}
+		
+		// Called after a resize, or the pointer origin will not move accordingly.
+		private function resetOriginCalculation():void {
+			countOfMeasurements = 0;
+		}
+		//------------------------------------------------------------------------	
 		
 		[Bindable][Inspectable]
 		public var valueFormatter:Formatter = null;
@@ -355,7 +385,7 @@ package com.betterthantomorrow.components {
 			addChild(_minLabel);
 			addChild(_maxLabel);
 		}
-				
+		
 		override protected function measure():void {
 			super.measure();
 			if (_diameter != width) {
@@ -378,7 +408,8 @@ package com.betterthantomorrow.components {
 				
 				_pointer.height = _diameter / 2 * POINTER_HEIGHT;
 				_pointer.width = _diameter * POINTER_WIDTH;
-				var pointerCenter:Point = new Point(_pointer.width / 2, _pointer.height * POINTER_ORIGIN_SCALE);
+				//const pointerCenter:Point = new Point(_pointer.width / 2, _pointer.height * POINTER_ORIGIN_SCALE);
+				const pointerCenter:Point = getPointOrigin(_pointer);
 				_lastPointerRotation = _pointer.rotation;
 				_pointer.rotation = 0;
 				_pointer.x = _diameter / 2 - pointerCenter.x;
@@ -457,6 +488,8 @@ package com.betterthantomorrow.components {
 			_maxLabel.setStyle("color", fontColor);
 			_minLabel.visible = _maxLabel.visible = _showMinMax;
 			
+			// Enable origin calculation
+			resetOriginCalculation();
 			measure();
 			drawTicks();
 			drawAlerts();
